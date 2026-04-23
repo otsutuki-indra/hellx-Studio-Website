@@ -1,153 +1,135 @@
-import { GridBackground } from "@/components/layout/grid-background";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { Metadata } from "next";
+'use client';
 
-export const metadata: Metadata = {
-  title: "Terms of Service | HELLX STUDIO",
-  description: "Terms of Service for HELLX STUDIO - Read our terms and conditions for using our platform.",
-};
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 export default function TermsPage() {
   return (
-    <GridBackground>
-      <Navbar />
-      <main className="min-h-screen px-4 pb-16 pt-32">
-        <div className="mx-auto max-w-4xl">
-          <div className="glass-card rounded-3xl p-8 md:p-12">
-            <h1 className="mb-8 text-4xl font-bold gradient-text">Terms of Service</h1>
-            <p className="mb-6 text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Header */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 border-b border-border/30 backdrop-blur-md bg-background/80">
+        <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          HELLX
+        </Link>
+        <Link href="/">
+          <Button variant="ghost" size="sm">Back to Home</Button>
+        </Link>
+      </nav>
 
-            <div className="prose prose-invert max-w-none">
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">1. Agreement to Terms</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  By accessing or using HELLX STUDIO (&quot;the Service&quot;), you agree to be bound by these Terms of Service. 
-                  If you do not agree to these terms, please do not use our Service. We reserve the right to modify these 
-                  terms at any time, and your continued use constitutes acceptance of any changes.
-                </p>
-              </section>
+      <main className="max-w-4xl mx-auto px-8 pt-32 pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold mb-2">Terms of Service</h1>
+          <p className="text-muted-foreground mb-12">Last updated: April 23, 2026</p>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">2. Description of Service</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  HELLX STUDIO is a digital laboratory platform that provides AI-powered tools and services for building 
-                  next-generation digital experiences. Our services include but are not limited to AI assistants, project 
-                  management tools, and development resources.
-                </p>
-              </section>
+          <div className="prose prose-invert max-w-none space-y-8">
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">1. Acceptance of Terms</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                By accessing or using HELLX Studio (&quot;Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to all terms, you may not access the Service.
+              </p>
+            </section>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">3. User Accounts</h2>
-                <p className="mb-4 text-muted-foreground leading-relaxed">To use certain features, you must create an account. You agree to:</p>
-                <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                  <li>Provide accurate and complete registration information</li>
-                  <li>Maintain the security of your account credentials</li>
-                  <li>Accept responsibility for all activities under your account</li>
-                  <li>Notify us immediately of any unauthorized access</li>
-                  <li>Not share your account with others or create multiple accounts</li>
-                </ul>
-              </section>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">2. Description of Service</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                HELLX Studio is an AI-powered creative collaboration platform that provides:
+              </p>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground mt-2">
+                <li>Access to advanced AI language models (Groq, Gemini)</li>
+                <li>Real-time conversation and code assistance</li>
+                <li>Credit-based usage system</li>
+                <li>Conversation history and project management</li>
+                <li>API access for enterprise integrations</li>
+              </ul>
+            </section>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">4. Subscription Plans and Billing</h2>
-                <p className="mb-4 text-muted-foreground leading-relaxed">We offer the following subscription tiers:</p>
-                <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                  <li><strong className="text-foreground">Free Plan:</strong> Limited features with 50 AI queries per month</li>
-                  <li><strong className="text-foreground">Pro Plan ($29/month):</strong> Extended features with 500 AI queries per month</li>
-                  <li><strong className="text-foreground">Level Infinity ($99/month):</strong> Unlimited features and queries</li>
-                </ul>
-                <p className="mt-4 text-muted-foreground leading-relaxed">
-                  Subscriptions are billed in advance on a monthly or annual basis. You may cancel at any time, but refunds 
-                  are not provided for partial billing periods. We reserve the right to change pricing with 30 days notice.
-                </p>
-              </section>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">3. User Accounts</h2>
+              <h3 className="text-lg font-medium mb-2 text-foreground">3.1 Registration</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                You must provide accurate, complete information when creating an account. You are responsible for maintaining the confidentiality of your credentials.
+              </p>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">5. Acceptable Use</h2>
-                <p className="mb-4 text-muted-foreground leading-relaxed">You agree not to use the Service to:</p>
-                <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                  <li>Violate any applicable laws or regulations</li>
-                  <li>Infringe on intellectual property rights of others</li>
-                  <li>Transmit malware, viruses, or harmful code</li>
-                  <li>Attempt to gain unauthorized access to our systems</li>
-                  <li>Harass, abuse, or harm other users</li>
-                  <li>Generate illegal, harmful, or offensive content</li>
-                  <li>Circumvent usage limits or security measures</li>
-                  <li>Use the Service for competitive analysis</li>
-                </ul>
-              </section>
+              <h3 className="text-lg font-medium mb-2 mt-4 text-foreground">3.2 Account Security</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                You are responsible for all activities under your account. Notify us immediately of unauthorized access at security@hellxstudio.com.
+              </p>
+            </section>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">6. AI-Generated Content</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Our AI features generate content based on your inputs. You are responsible for reviewing and using 
-                  AI-generated content appropriately. We do not guarantee the accuracy, completeness, or suitability 
-                  of AI outputs. AI-generated content should not be used for critical decisions without human review.
-                </p>
-              </section>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">4. Credits and Billing</h2>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                <li>Free tier: 100 credits upon registration</li>
+                <li>Credits are consumed per AI interaction (1-2 credits per message)</li>
+                <li>Paid plans auto-renew unless cancelled</li>
+                <li>Unused credits do not roll over to the next billing cycle</li>
+                <li>Refunds are processed within 14 days for unused portions</li>
+              </ul>
+            </section>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">7. Intellectual Property</h2>
-                <p className="mb-4 text-muted-foreground leading-relaxed">
-                  <strong className="text-foreground">Our IP:</strong> The Service, including its design, features, and content, 
-                  is owned by HELLX STUDIO and protected by intellectual property laws.
-                </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  <strong className="text-foreground">Your Content:</strong> You retain ownership of content you create using our 
-                  Service. By using the Service, you grant us a limited license to process your content as necessary to 
-                  provide the Service.
-                </p>
-              </section>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">5. Acceptable Use</h2>
+              <p className="text-muted-foreground leading-relaxed">You agree NOT to:</p>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground mt-2">
+                <li>Generate illegal, harmful, or malicious content</li>
+                <li>Attempt to bypass rate limits or abuse the API</li>
+                <li>Use automated scripts to exploit the service</li>
+                <li>Impersonate others or misrepresent your identity</li>
+                <li>Violate intellectual property rights</li>
+                <li>Distribute malware or phishing content</li>
+                <li>Generate content that exploits minors</li>
+              </ul>
+            </section>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">8. Disclaimer of Warranties</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. 
-                  WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR SECURE. WE DISCLAIM ALL 
-                  WARRANTIES INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-                </p>
-              </section>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">6. Intellectual Property</h2>
+              <h3 className="text-lg font-medium mb-2 text-foreground">6.1 Your Content</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                You retain ownership of content you create using our Service. You grant us a license to process and store this content to provide the Service.
+              </p>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">9. Limitation of Liability</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  TO THE MAXIMUM EXTENT PERMITTED BY LAW, HELLX STUDIO SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, 
-                  SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES. OUR TOTAL LIABILITY 
-                  SHALL NOT EXCEED THE AMOUNT PAID BY YOU IN THE TWELVE MONTHS PRECEDING THE CLAIM.
-                </p>
-              </section>
+              <h3 className="text-lg font-medium mb-2 mt-4 text-foreground">6.2 AI-Generated Content</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Output generated by our AI models is provided &quot;as-is&quot;. You are responsible for reviewing and using AI outputs appropriately.
+              </p>
+            </section>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">10. Termination</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We may suspend or terminate your access to the Service at any time for violation of these terms or 
-                  for any other reason at our sole discretion. Upon termination, your right to use the Service ceases 
-                  immediately. You may terminate your account at any time through your account settings.
-                </p>
-              </section>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">7. Limitation of Liability</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                HELLX Studio is provided &quot;AS IS&quot; without warranties. We are not liable for indirect, incidental, or consequential damages. Our total liability is limited to amounts paid in the 12 months prior to the claim.
+              </p>
+            </section>
 
-              <section className="mb-8">
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">11. Governing Law</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in 
-                  which HELLX STUDIO operates, without regard to conflict of law principles. Any disputes shall be 
-                  resolved through binding arbitration.
-                </p>
-              </section>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">8. Termination</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                We may suspend or terminate accounts that violate these terms. Upon termination, your right to use the Service ceases immediately. You may export your data within 30 days of termination.
+              </p>
+            </section>
 
-              <section>
-                <h2 className="mb-4 text-2xl font-semibold text-foreground">12. Contact Information</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  For questions about these Terms of Service, please contact us at:
-                </p>
-                <p className="mt-4 text-neon-blue">legal@hellxstudio.com</p>
-              </section>
-            </div>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">9. Changes to Terms</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                We may modify these terms at any time. Continued use after changes constitutes acceptance. Material changes will be notified via email.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">10. Contact</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                Questions about these Terms? Contact us at:
+              </p>
+              <p className="text-primary mt-2">legal@hellxstudio.com</p>
+            </section>
           </div>
-        </div>
+        </motion.div>
       </main>
-      <Footer />
-    </GridBackground>
+    </div>
   );
 }

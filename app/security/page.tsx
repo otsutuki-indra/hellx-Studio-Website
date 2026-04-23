@@ -1,150 +1,155 @@
-import { GridBackground } from "@/components/layout/grid-background";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { GlassCard } from "@/components/ui/glass-card";
-import { Metadata } from "next";
-import { Shield, Lock, Key, Eye, Server, CheckCircle } from "lucide-react";
+'use client';
 
-export const metadata: Metadata = {
-  title: "Security | HELLX STUDIO",
-  description: "Learn about HELLX STUDIO's security practices and how we protect your data.",
-};
-
-const securityFeatures = [
-  {
-    icon: Lock,
-    title: "Encryption at Rest & Transit",
-    description: "All data is encrypted using AES-256 encryption at rest and TLS 1.3 in transit.",
-  },
-  {
-    icon: Key,
-    title: "Secure Authentication",
-    description: "Enterprise-grade authentication powered by Clerk with MFA support and secure session management.",
-  },
-  {
-    icon: Eye,
-    title: "Privacy by Design",
-    description: "Minimal data collection, strict access controls, and transparent data handling practices.",
-  },
-  {
-    icon: Server,
-    title: "Infrastructure Security",
-    description: "Hosted on Vercel's secure infrastructure with automatic failover and DDoS protection.",
-  },
-  {
-    icon: Shield,
-    title: "Regular Security Audits",
-    description: "Continuous security monitoring, penetration testing, and vulnerability assessments.",
-  },
-  {
-    icon: CheckCircle,
-    title: "Compliance",
-    description: "Designed to meet GDPR, SOC 2, and other international data protection standards.",
-  },
-];
-
-const practices = [
-  "24/7 security monitoring and incident response",
-  "Regular third-party security audits",
-  "Secure software development lifecycle (SSDLC)",
-  "Employee security training and background checks",
-  "Bug bounty program for responsible disclosure",
-  "Data backup and disaster recovery procedures",
-];
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function SecurityPage() {
+  const securityFeatures = [
+    {
+      title: 'Encryption at Rest',
+      description: 'All data stored in our Turso database is encrypted using AES-256 encryption.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'TLS 1.3',
+      description: 'All data in transit is protected with the latest TLS 1.3 encryption protocol.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Secure Authentication',
+      description: 'Passwords hashed with bcrypt (12 rounds), JWT tokens with 7-day expiration.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'SOC 2 Compliance',
+      description: 'Our infrastructure and processes are SOC 2 Type II certified.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
-    <GridBackground>
-      <Navbar />
-      <main className="min-h-screen px-4 pb-16 pt-32">
-        <div className="mx-auto max-w-6xl">
-          {/* Header */}
-          <div className="mb-16 text-center">
-            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-neon-blue/20 to-neon-teal/20">
-              <Shield className="h-10 w-10 text-neon-blue" />
-            </div>
-            <h1 className="mb-6 text-5xl font-bold md:text-6xl">
-              <span className="gradient-text">Security</span>
-            </h1>
-            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              Your trust is our priority. Learn how we protect your data and maintain 
-              the highest security standards.
-            </p>
-          </div>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Header */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 border-b border-border/30 backdrop-blur-md bg-background/80">
+        <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          HELLX
+        </Link>
+        <Link href="/">
+          <Button variant="ghost" size="sm">Back to Home</Button>
+        </Link>
+      </nav>
+
+      <main className="max-w-4xl mx-auto px-8 pt-32 pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold mb-2">Security</h1>
+          <p className="text-muted-foreground mb-12">How we protect your data and privacy</p>
 
           {/* Security Features Grid */}
-          <div className="mb-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {securityFeatures.map((feature) => (
-              <GlassCard key={feature.title} className="p-6">
-                <div className="mb-4 inline-flex rounded-xl bg-neon-blue/10 p-3 text-neon-blue">
-                  <feature.icon className="h-6 w-6" />
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
-              </GlassCard>
+          <div className="grid md:grid-cols-2 gap-6 mb-16">
+            {securityFeatures.map((feature, idx) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              >
+                <Card className="h-full border-border bg-card/50">
+                  <CardContent className="pt-6">
+                    <div className="text-primary mb-4">{feature.icon}</div>
+                    <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
 
-          {/* Security Practices */}
-          <GlassCard className="mb-16 p-8 md:p-12">
-            <h2 className="mb-6 text-3xl font-bold text-foreground">Our Security Practices</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              {practices.map((practice) => (
-                <div key={practice} className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
-                  <span className="text-muted-foreground">{practice}</span>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-
-          {/* Data Protection */}
-          <div className="grid gap-8 md:grid-cols-2">
-            <GlassCard className="p-8">
-              <h2 className="mb-4 text-2xl font-bold text-foreground">Data Protection</h2>
-              <p className="mb-4 text-muted-foreground leading-relaxed">
-                We implement comprehensive data protection measures including:
+          <div className="prose prose-invert max-w-none space-y-8">
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Infrastructure Security</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                HELLX Studio runs on enterprise-grade infrastructure with multiple layers of security:
               </p>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neon-blue" />
-                  Strict data access controls and role-based permissions
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neon-blue" />
-                  Automated data retention and deletion policies
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neon-blue" />
-                  Secure API endpoints with rate limiting
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neon-blue" />
-                  Regular security patches and updates
-                </li>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground mt-2">
+                <li><strong className="text-foreground">Vercel Edge Network:</strong> Global CDN with DDoS protection and automatic SSL</li>
+                <li><strong className="text-foreground">Turso Database:</strong> Edge SQLite with automatic encryption and geo-replication</li>
+                <li><strong className="text-foreground">AI Provider Security:</strong> Groq and Google maintain SOC 2 compliance for model inference</li>
+                <li><strong className="text-foreground">Network Isolation:</strong> Private VPC with strict firewall rules</li>
               </ul>
-            </GlassCard>
+            </section>
 
-            <GlassCard className="p-8">
-              <h2 className="mb-4 text-2xl font-bold text-foreground">Report a Vulnerability</h2>
-              <p className="mb-4 text-muted-foreground leading-relaxed">
-                We appreciate the security research community&apos;s efforts in keeping our 
-                platform safe. If you discover a security vulnerability, please report it 
-                responsibly.
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Data Protection</h2>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                <li>Passwords are never stored in plain text - we use bcrypt with 12 salt rounds</li>
+                <li>Session tokens use cryptographically secure random generation</li>
+                <li>All API endpoints require authentication via JWT</li>
+                <li>Rate limiting prevents brute force attacks (100 requests/minute)</li>
+                <li>Automatic session expiration after 7 days of inactivity</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">AI Model Security</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                When you interact with our AI models:
               </p>
-              <p className="mb-4 text-muted-foreground leading-relaxed">
-                Send vulnerability reports to:
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground mt-2">
+                <li>Prompts are transmitted over encrypted connections to AI providers</li>
+                <li>Neither Groq nor Google retains your conversation data for training</li>
+                <li>We implement content filtering to prevent harmful outputs</li>
+                <li>All AI responses are logged for abuse prevention and audit trails</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Incident Response</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                In the event of a security incident:
               </p>
-              <p className="text-neon-blue font-medium">security@hellxstudio.com</p>
-              <p className="mt-4 text-sm text-muted-foreground">
-                We aim to respond to all reports within 24 hours and will work with you 
-                to understand and address the issue promptly.
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground mt-2">
+                <li>Affected users are notified within 72 hours</li>
+                <li>Compromised sessions are immediately revoked</li>
+                <li>Root cause analysis is conducted and documented</li>
+                <li>Security patches are deployed within 24 hours</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Vulnerability Disclosure</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                Found a security vulnerability? We appreciate responsible disclosure.
               </p>
-            </GlassCard>
+              <p className="text-primary mt-4">Report vulnerabilities to: security@hellxstudio.com</p>
+              <p className="text-muted-foreground mt-2">
+                We offer a bug bounty program for qualifying vulnerabilities. Response time: 24-48 hours.
+              </p>
+            </section>
           </div>
-        </div>
+        </motion.div>
       </main>
-      <Footer />
-    </GridBackground>
+    </div>
   );
 }
