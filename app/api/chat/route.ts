@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { streamText, StreamingTextResponse } from 'ai';
+import { streamText } from 'ai';
 import { groq } from '@ai-sdk/groq';
 import { google } from '@ai-sdk/google';
 import { createClient } from '@libsql/client';
@@ -100,8 +100,6 @@ export async function POST(request: NextRequest) {
     }
 
     // ============ SELECT AI MODEL ============
-    // Using llama3-70b-8192 for Groq (Mixtral is decommissioned)
-    // Using gemini-2.0-flash for Google
     const selectedModel =
       model === 'gemini' ? google('gemini-2.0-flash') : groq('llama3-70b-8192');
 
@@ -117,12 +115,11 @@ export async function POST(request: NextRequest) {
       temperature: 0.7,
       maxTokens: 1024,
       system:
-        'You are HELLX, an advanced AI creative assistant for the HELLX STUDIO cyber-laboratory. Be concise, helpful, insightful, and professional. Your responses are for a cutting-edge AI platform.',
+        'You are HELLX, an advanced AI creative assistant. Be concise, helpful, and insightful.',
       
       // ============ HANDLE STREAM COMPLETION ============
       onFinish: async (event) => {
         try {
-          // Save assistant response
           const assistantMsgId = uuidv4();
           const responseText = event.text || '';
           const estimatedTokens = Math.ceil(responseText.length / 4);
@@ -158,13 +155,13 @@ export async function POST(request: NextRequest) {
                   userId,
                   -1,
                   'usage',
-                  `AI Query via ${modelName} (${estimatedTokens} tokens)`,
+                  `AI Query via ${modelName}`,
                   Math.floor(Date.now() / 1000),
                 ],
               },
             ]);
 
-            console.log(`[CHAT_API] ✅ Processed query for user ${userId}, credits deducted`);
+            console.log(`[CHAT_API] ✅ Processed query for user ${userId}`);
           } catch (creditError) {
             console.error('[CHAT_API] Credit deduction error:', creditError);
           }
@@ -175,23 +172,7 @@ export async function POST(request: NextRequest) {
     });
 
     // ============ RETURN STREAMING RESPONSE ============
-    try {
-      if (result.toDataStreamResponse) {
-        return result.toDataStreamResponse();
-      }
-      
-      if (result.toAIStream) {
-        return new StreamingTextResponse(result.toAIStream());
-      }
-
-      return new StreamingTextResponse(result.toAIStream?.() || result as any);
-    } catch (streamError) {
-      console.error('[CHAT_API] Stream response error:', streamError);
-      return NextResponse.json(
-        { error: 'Failed to stream response' },
-        { status: 500 }
-      );
-    }
+    return result.toDataStreamResponse();
   } catch (error) {
     console.error('[CHAT_API] Critical error:', error);
     return NextResponse.json(
