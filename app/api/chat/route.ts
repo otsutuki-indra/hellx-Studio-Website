@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { streamText } from 'ai';
+import { streamText, StreamingTextResponse } from 'ai';
 import { groq } from '@ai-sdk/groq';
 import { google } from '@ai-sdk/google';
 import { createClient } from '@libsql/client';
@@ -16,7 +16,7 @@ export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
-    // Extract and verify auth
+    // ============ AUTHENTICATION ============
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -29,17 +29,29 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = verified.userId;
-    const { message, conversationId, model = 'groq', topic = 'general' } = await request.json();
+
+    // ============ REQUEST VALIDATION ============
+    const body = await request.json();
+    const { message, conversationId, model = 'groq', topic = 'general' } = body;
 
     if (!message || !message.trim()) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    // Get user's credits
-    const userResult = await db.execute({
-      sql: 'SELECT credits FROM users WHERE id = ?',
-      args: [userId],
-    });
+    // ============ CREDIT CHECK ============
+    let userResult;
+    try {
+      userResult = await db.execute({
+        sql: 'SELECT credits FROM users WHERE id = ?',
+        args: [userId],
+      });
+    } catch (dbError) {
+      console.error('[CHAT_API] Database fetch error:', dbError);
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 503 }
+      );
+    }
 
     if (userResult.rows.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -48,43 +60,54 @@ export async function POST(request: NextRequest) {
     const credits = (userResult.rows[0].credits as number) || 0;
     if (credits < 1) {
       return NextResponse.json(
-        { error: 'Insufficient credits' },
+        { error: 'Insufficient credits. Please purchase more.' },
         { status: 402 }
       );
     }
 
-    // Create or use existing conversation
+    // ============ CONVERSATION SETUP ============
     let convId = conversationId;
     if (!convId) {
       convId = uuidv4();
-      await db.execute({
-        sql: `INSERT INTO conversations (id, user_id, title, topic, created_at, updated_at) 
-              VALUES (?, ?, ?, ?, ?, ?)`,
-        args: [
-          convId,
-          userId,
-          message.substring(0, 50),
-          topic,
-          Math.floor(Date.now() / 1000),
-          Math.floor(Date.now() / 1000),
-        ],
-      });
+      try {
+        await db.execute({
+          sql: `INSERT INTO conversations (id, user_id, title, topic, created_at, updated_at) 
+                VALUES (?, ?, ?, ?, ?, ?)`,
+          args: [
+            convId,
+            userId,
+            message.substring(0, 50) + (message.length > 50 ? '...' : ''),
+            topic,
+            Math.floor(Date.now() / 1000),
+            Math.floor(Date.now() / 1000),
+          ],
+        });
+      } catch (dbError) {
+        console.error('[CHAT_API] Conversation creation error:', dbError);
+      }
     }
 
-    // Save user message
+    // ============ SAVE USER MESSAGE ============
     const userMsgId = uuidv4();
-    await db.execute({
-      sql: `INSERT INTO messages (id, conversation_id, role, content, created_at) 
-            VALUES (?, ?, ?, ?, ?)`,
-      args: [userMsgId, convId, 'user', message, Math.floor(Date.now() / 1000)],
-    });
+    try {
+      await db.execute({
+        sql: `INSERT INTO messages (id, conversation_id, role, content, created_at) 
+              VALUES (?, ?, ?, ?, ?)`,
+        args: [userMsgId, convId, 'user', message, Math.floor(Date.now() / 1000)],
+      });
+    } catch (dbError) {
+      console.error('[CHAT_API] User message save error:', dbError);
+    }
 
-    // Select model
-    const aiModel = model === 'gemini' ? google('gemini-2.0-flash') : groq('llama3-70b-8192');
+    // ============ SELECT AI MODEL ============
+    // Using llama3-70b-8192 for Groq (Mixtral is decommissioned)
+    // Using gemini-2.0-flash for Google
+    const selectedModel =
+      model === 'gemini' ? google('gemini-2.0-flash') : groq('llama3-70b-8192');
 
-    // Stream text generation with Vercel AI SDK v3.1+
+    // ============ STREAM TEXT GENERATION ============
     const result = streamText({
-      model: aiModel,
+      model: selectedModel,
       messages: [
         {
           role: 'user',
@@ -93,54 +116,89 @@ export async function POST(request: NextRequest) {
       ],
       temperature: 0.7,
       maxTokens: 1024,
-      system: 'You are HELLX, an advanced AI creative assistant. Be concise, helpful, and insightful.',
+      system:
+        'You are HELLX, an advanced AI creative assistant for the HELLX STUDIO cyber-laboratory. Be concise, helpful, insightful, and professional. Your responses are for a cutting-edge AI platform.',
+      
+      // ============ HANDLE STREAM COMPLETION ============
       onFinish: async (event) => {
-        // Save assistant message on stream completion
-        const assistantMsgId = uuidv4();
-        const responseText = event.text || '';
+        try {
+          // Save assistant response
+          const assistantMsgId = uuidv4();
+          const responseText = event.text || '';
+          const estimatedTokens = Math.ceil(responseText.length / 4);
 
-        await db.execute({
-          sql: `INSERT INTO messages (id, conversation_id, role, content, tokens_used, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?)`,
-          args: [
-            assistantMsgId,
-            convId,
-            'assistant',
-            responseText,
-            Math.ceil(responseText.length / 4), // Rough token estimate
-            Math.floor(Date.now() / 1000),
-          ],
-        });
-
-        // Deduct credits (1 credit per query)
-        const txId = uuidv4();
-        await db.batch([
-          {
-            sql: `UPDATE users SET credits = credits - 1 WHERE id = ?`,
-            args: [userId],
-          },
-          {
-            sql: `INSERT INTO credit_transactions (id, user_id, amount, type, description, created_at)
+          await db.execute({
+            sql: `INSERT INTO messages (id, conversation_id, role, content, tokens_used, created_at) 
                   VALUES (?, ?, ?, ?, ?, ?)`,
             args: [
-              txId,
-              userId,
-              -1,
-              'usage',
-              `AI Query via ${model === 'gemini' ? 'Research' : 'HellV1'}`,
+              assistantMsgId,
+              convId,
+              'assistant',
+              responseText,
+              estimatedTokens,
               Math.floor(Date.now() / 1000),
             ],
-          },
-        ]);
+          });
+
+          // ============ DEDUCT CREDITS ============
+          const txId = uuidv4();
+          const modelName = model === 'gemini' ? 'Research (Gemini)' : 'HellV1 (Groq)';
+
+          try {
+            await db.batch([
+              {
+                sql: `UPDATE users SET credits = credits - 1 WHERE id = ?`,
+                args: [userId],
+              },
+              {
+                sql: `INSERT INTO credit_transactions (id, user_id, amount, type, description, created_at)
+                      VALUES (?, ?, ?, ?, ?, ?)`,
+                args: [
+                  txId,
+                  userId,
+                  -1,
+                  'usage',
+                  `AI Query via ${modelName} (${estimatedTokens} tokens)`,
+                  Math.floor(Date.now() / 1000),
+                ],
+              },
+            ]);
+
+            console.log(`[CHAT_API] ✅ Processed query for user ${userId}, credits deducted`);
+          } catch (creditError) {
+            console.error('[CHAT_API] Credit deduction error:', creditError);
+          }
+        } catch (finishError) {
+          console.error('[CHAT_API] onFinish error:', finishError);
+        }
       },
     });
 
-    // Return streaming response
-    return result.toDataStreamResponse();
+    // ============ RETURN STREAMING RESPONSE ============
+    try {
+      if (result.toDataStreamResponse) {
+        return result.toDataStreamResponse();
+      }
+      
+      if (result.toAIStream) {
+        return new StreamingTextResponse(result.toAIStream());
+      }
+
+      return new StreamingTextResponse(result.toAIStream?.() || result as any);
+    } catch (streamError) {
+      console.error('[CHAT_API] Stream response error:', streamError);
+      return NextResponse.json(
+        { error: 'Failed to stream response' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('[CHAT_API] Error:', error);
+    console.error('[CHAT_API] Critical error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     );
   }
